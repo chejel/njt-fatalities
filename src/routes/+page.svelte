@@ -2,7 +2,7 @@
 	import Map from '$lib/components/Map.svelte';
 	import IncrementDate from '$lib/components/Date.svelte';
 
-	import { onMount, onDestroy } from 'svelte';
+	import { onDestroy } from 'svelte';
 
 	let date = new Date(2023, 0, 0); // Initial date set to January 1, 2023
 	let endDate = new Date(2023, 11, 30); // End date set to December 31, 2023
@@ -50,8 +50,6 @@
 		filteredNJTData = njtFatalities.filter((d) => d['Incident Date'] === dateNumString);
 	}
 
-	$: console.log(matchingCounty);
-
 	// Reactive statement to handle interval
 	let interval;
 	const startInterval = () => {
@@ -66,12 +64,48 @@
 			startInterval(); // Restart the interval after 5 seconds
 		}, 5000);
 	}
-	let matchingCounty = null;
-	$: if (matchingDate) matchingCounty = filteredNJTData[0]['County'];
-	else matchingCounty = null;
+
+	let closestStation = null;
+	$: if (matchingDate) closestStation = filteredNJTData[0]['Closest Station to Incident'];
+	else closestStation = null;
 </script>
 
-<Map county={matchingCounty} />
-<IncrementDate {matchingDate} {dateString} {filteredNJTData} />
+<main class="container">
+	<div class="map">
+		<Map {filteredNJTData} {closestStation} />
+	</div>
+	<div class="content">
+		<div class="buttons">
+			<button on:click={() => (intervalState = !intervalState)}>Restart</button>
+			<button>Pause</button>
+		</div>
+		<div class="text">
+			<IncrementDate {matchingDate} {dateString} />
+		</div>
+	</div>
+</main>
 
-<button on:click={() => (intervalState = !intervalState)}>Toggle</button>
+<style>
+	.container {
+		position: relative;
+		height: 100svh;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.map {
+		position: absolute;
+		width: 100%;
+		z-index: 1;
+	}
+
+	.content {
+		position: absolute;
+		left: 55svw;
+		bottom: 10px;
+		height: 25svh;
+		z-index: 2;
+	}
+</style>
