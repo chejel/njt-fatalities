@@ -1,6 +1,17 @@
 <script>
 	import njCountiesRaw from '$lib/data/njCounties.json';
 	let njCounties = njCountiesRaw.features;
+	import { onMount } from 'svelte';
+
+	let minX = 225,
+		minY = 10;
+
+	onMount(() => {
+		if (window.matchMedia('(max-width: 480px)').matches) {
+			minX = 100;
+			minY = 15;
+		}
+	});
 
 	let width = 800,
 		height = 300;
@@ -35,8 +46,7 @@
 			.toString();
 </script>
 
-<!-- Code prevents white border of adjacent counties from appearing within yellow stroke of county of an incident -->
-<svg viewBox="200 10 {width} {height}">
+<svg viewBox="{minX} {minY} {width} {height}">
 	<g fill="none">
 		{#each njCounties as feature}
 			<path d={path(feature)} stroke="silver" stroke-opacity="0.5" stroke-width="0.5" />
@@ -52,7 +62,7 @@
 					cy={feature.coordinates[1]}
 					r="1.5"
 					opacity="0.4"
-					fill="#FFC700"
+					fill="var(--bright-orange)"
 				/>
 			{/if}
 		{/each}
@@ -64,27 +74,21 @@
 					cx={feature.coordinates[0]}
 					cy={feature.coordinates[1]}
 					r="3"
-					stroke="#1C272A"
+					stroke="var(--dark)"
 					stroke-width="1"
 					opacity="1"
 					fill="#E2B400"
 				/>
 				<!-- station label -->
-				<text
-					class="station-label"
-					x={feature.coordinates[0] + 5}
-					y={feature.coordinates[1] - 5}
-					fill="#333"
-				>
+				<text class="station-label" x={feature.coordinates[0] + 10} y={feature.coordinates[1] - 10}>
 					{feature.station} Station</text
 				>
 				<!-- rail line label -->
 				<text
 					class="line-label"
-					x={feature.coordinates[0] + 5}
-					y={feature.coordinates[1] - 5}
+					x={feature.coordinates[0] + 10}
+					y={feature.coordinates[1] - 10}
 					dy={12}
-					fill="#333"
 				>
 					{feature.line
 						.replace('AC', 'Atlantic City Line')
@@ -93,16 +97,15 @@
 						.replace('BC', 'Bergen County Line')
 						.replace('ME', 'Morris & Essex Line')
 						.replace('ML', 'Main Line')
-						.replace('NE', 'Northeast Corridor')
+						.replace('NE', 'Northeast Corridor Line')
 						.replace('RV', 'Raritan Valley Line')}</text
 				>
 				<!-- time label -->
 				<text
 					class="time-label"
-					x={feature.coordinates[0] + 5}
-					y={feature.coordinates[1] - 5}
-					fill="#333"
-					dy={24}
+					x={feature.coordinates[0] + 10}
+					y={feature.coordinates[1] - 10}
+					dy={23}
 				>
 					{feature.day} at {feature.time}</text
 				>
@@ -112,22 +115,32 @@
 </svg>
 
 <style>
+	text {
+		font-family: 'Barlow Condensed', sans-serif;
+	}
+
 	.station-label {
 		font-size: 0.85rem;
-		fill: #ecb159;
+		fill: var(--orange);
 		font-weight: 600;
 	}
 
 	.line-label,
 	.time-label {
 		font-size: 0.7rem;
-		fill: #fff;
+		fill: var(--white);
 		font-weight: 500;
 	}
 
 	.time-label {
-		font-size: 0.6rem;
+		font-size: 0.55rem;
 		font-weight: 400;
 		text-transform: uppercase;
+	}
+
+	@media screen and (max-width: 480px) {
+		svg {
+			transform: scale(4);
+		}
 	}
 </style>

@@ -1,6 +1,11 @@
 <script>
 	import Map from '$lib/components/Map.svelte';
+	import About from '$lib/components/About.svelte';
 	import IncrementDate from '$lib/components/Date.svelte';
+	import RefreshIcon from '$lib/components/RefreshIcon.svelte';
+	import PlayIcon from '$lib/components/PlayIcon.svelte';
+	import PauseIcon from '$lib/components/PauseIcon.svelte';
+	import { fade } from 'svelte/transition';
 
 	import { onDestroy } from 'svelte';
 
@@ -12,19 +17,21 @@
 
 	const updateDate = () => {
 		if (date <= endDate) {
-			date.setDate(date.getDate() + 1); // Increment the date by one day
+			date.setDate(date.getDate() + 1); // Increment date by one day
 
 			dateString = date.toLocaleDateString('en-US', dateStringFormat);
 		} else {
-			clearInterval(interval); // Stop the interval when the end date is reached
+			clearInterval(interval); // Stop interval at end date
 		}
-		date = new Date(date); // Create a new Date object to trigger reactivity
+		date = new Date(date); // Create new Date object to trigger reactivity
 	};
 
 	let intervalState = false;
 
 	$: if (intervalState) {
 		startInterval(); // Pauses interval
+	} else {
+		clearInterval(interval); // Stops interval
 	}
 
 	onDestroy(() => {
@@ -37,7 +44,7 @@
 
 	// Check if incremented date is in NJT data
 	$: dateNumString = date.toLocaleDateString('en-US', dateNumFormat).toString();
-	let matchingDate = false;
+	let matchingDate = null;
 	let filteredNJTData;
 
 	$: if (
@@ -51,8 +58,9 @@
 	}
 
 	// Reactive statement to handle interval
-	let interval;
+	let interval = null;
 	const startInterval = () => {
+		clearInterval(interval); // Clear previous interval
 		interval = setInterval(updateDate, 150);
 	};
 
@@ -60,8 +68,8 @@
 		clearInterval(interval); // Clear the interval
 
 		setTimeout(() => {
-			matchingDate = false; // Reset the matchingDate after 5 seconds
-			startInterval(); // Restart the interval after 5 seconds
+			matchingDate = false; // Reset matchingDate after 5 seconds
+			startInterval(); // Restart interval after 5 seconds
 		}, 5000);
 	}
 
@@ -74,13 +82,37 @@
 	<div class="map">
 		<Map {filteredNJTData} {closestStation} />
 	</div>
+
 	<div class="content">
-		<div class="buttons">
-			<button on:click={() => (intervalState = !intervalState)}>Restart</button>
-			<button>Pause</button>
+		<!-- text -->
+		<div class="introduction" transition:fade={{ delay: 300 }} class:dim={interval}>
+			<About />
 		</div>
-		<div class="text">
-			<IncrementDate {matchingDate} {dateString} />
+		<!-- date + controls -->
+		<div class="date-container" in:fade={{ delay: 300 }}>
+			<div class="text">
+				<IncrementDate {interval} {matchingDate} {dateString} />
+			</div>
+			<div class="buttons">
+				<button on:click={() => (intervalState = !intervalState)}
+					><PlayIcon
+						fillColor={!interval ? 'var(--orange)' : 'var(--silver)'}
+						strokeColor={!interval ? 'var(--bright-orange)' : 'var(--white)'}
+					/></button
+				>
+				<button on:click={() => (intervalState = !intervalState)}><PauseIcon /></button>
+				<button
+					on:click={() => {
+						clearInterval(interval); // Clear interval
+						interval = null; // Reset interval
+						intervalState = false; // Reset intervalStart
+						date = new Date(2023, 0, 0); // Reset date to initial state
+						matchingDate = false; // Reset matchingDate
+						closestStation = null; // Reset closestStation
+						filteredNJTData = null; // Reset filteredNJTData
+					}}><RefreshIcon /></button
+				>
+			</div>
 		</div>
 	</div>
 </main>
@@ -103,9 +135,58 @@
 
 	.content {
 		position: absolute;
-		left: 55svw;
-		bottom: 10px;
+		left: 50svw;
+		top: 100px;
 		height: 25svh;
 		z-index: 2;
+	}
+
+	.introduction {
+		width: 500px;
+	}
+
+	.dim {
+		opacity: 0.25;
+		transition: 1s;
+	}
+
+	.buttons button {
+		border: 0;
+		padding: 0 0.15rem 0 0;
+	}
+
+	@media screen and (max-width: 480px) {
+		.content {
+			left: 0;
+			top: 0;
+			height: 100svh;
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+			align-items: center;
+			padding: 1rem;
+			overflow: hidden;
+		}
+
+		.introduction {
+			margin-top: auto;
+			width: 100%;
+			background-color: rgba(28, 39, 42, 0.75);
+			padding: 1rem;
+			border-radius: 5px;
+			overflow: auto;
+			box-shadow: 0px 0px 20px 5px rgba(0, 0, 0, 0.1);
+		}
+
+		.dim {
+			opacity: 0;
+		}
+
+		.date-container {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			bottom: 0;
+		}
 	}
 </style>
