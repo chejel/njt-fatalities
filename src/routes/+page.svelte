@@ -120,29 +120,28 @@
 <style>
 	.container {
 		position: relative;
-		height: 100svh;
 		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
 	}
 
 	.map {
-		position: absolute;
-		width: 100%;
-		z-index: 1;
+		width: 50svw;
+		flex-grow: 1;
 	}
 
 	.content {
-		position: absolute;
-		left: 50svw;
-		top: 100px;
-		height: 25svh;
-		z-index: 2;
+		width: 50svw;
+		flex-grow: 1;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-around;
+		align-items: flex-start;
+		height: 100svh;
 	}
 
 	.introduction {
-		width: 500px;
+		width: min(90%, 500px);
+		overflow: auto;
 	}
 
 	.dim {
@@ -156,25 +155,30 @@
 	}
 
 	@media screen and (max-width: 480px) {
+		.container {
+			height: 100svh;
+		}
+
+		.map {
+			width: 100svw;
+		}
+
 		.content {
+			position: absolute;
 			left: 0;
 			top: 0;
-			height: 100svh;
-			display: flex;
-			flex-direction: column;
 			justify-content: space-between;
 			align-items: center;
 			padding: 1rem;
 			overflow: hidden;
+			width: 100svw;
 		}
 
 		.introduction {
-			margin-top: auto;
 			width: 100%;
 			background-color: rgba(28, 39, 42, 0.75);
 			padding: 1rem;
 			border-radius: 5px;
-			overflow: auto;
 			box-shadow: 0px 0px 20px 5px rgba(0, 0, 0, 0.1);
 		}
 

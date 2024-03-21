@@ -28,8 +28,9 @@
 		<span style="text-transform: uppercase; font-weight: 600; color: var(--silver);">restart</span> the
 		date incrementation.
 	</p>
-	<p>
-		Data sources: <a href="https://www.nj.com/">nj.com</a>,
+	<p class="sources">
+		<span style="font-weight: 700; color: var(--beige);">Data sources</span>:
+		<a href="https://www.nj.com/">nj.com</a>,
 		<a href="https://patch.com">Patch</a>, NJ Geographic Information Network (<a
 			href="https://njogis-newjersey.opendata.arcgis.com/datasets/newjersey::county-boundaries-of-nj-hosted-3857/about"
 			>county map</a
@@ -52,9 +53,20 @@
 		margin-bottom: 1rem;
 	}
 
+	.sources {
+		font-size: 0.85rem;
+		background-color: rgba(28, 39, 42, 0.3);
+		padding: 0.5rem;
+		border-radius: 3px;
+	}
+
 	@media screen and (max-width: 480px) {
 		.intro-body {
 			font-size: 1rem;
+		}
+
+		.sources {
+			background-color: rgba(28, 39, 42, 1);
 		}
 	}
 </style>
