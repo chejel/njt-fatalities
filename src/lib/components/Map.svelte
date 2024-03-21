@@ -1,23 +1,15 @@
 <script>
 	import njCountiesRaw from '$lib/data/njCounties.json';
 	let njCounties = njCountiesRaw.features;
-	import { onMount } from 'svelte';
+	let innerWidth;
 
-	let minX = 225,
-		minY = 10;
+	$: console.log(innerWidth);
 
-	onMount(() => {
-		if (window.matchMedia('(max-width: 480px)').matches) {
-			minX = 100;
-			minY = 15;
-		}
-	});
-
-	let width = 800,
-		height = 300;
+	let width = 300,
+		height = 270;
 
 	import { geoMercator, geoPath } from 'd3-geo';
-	const projection = geoMercator().center([-75, 39.35]).scale(5000);
+	const projection = geoMercator().center([-70.9, 38.9]).scale(4000);
 	const path = geoPath(projection);
 
 	import njtStationsRaw from '$lib/data/njt-rail-stations.json';
@@ -46,10 +38,18 @@
 			.toString();
 </script>
 
-<svg viewBox="{minX} {minY} {width} {height}">
+<svelte:window bind:innerWidth />
+
+<svg viewBox="0 0 {width} {height}">
 	<g fill="none">
 		{#each njCounties as feature}
-			<path d={path(feature)} stroke="silver" stroke-opacity="0.5" stroke-width="0.5" />
+			<path
+				class="counties"
+				d={path(feature)}
+				stroke="var(--silver)"
+				stroke-opacity="0.5"
+				stroke-width="0.5"
+			/>
 		{/each}
 	</g>
 
@@ -80,16 +80,11 @@
 					fill="#E2B400"
 				/>
 				<!-- station label -->
-				<text class="station-label" x={feature.coordinates[0] + 10} y={feature.coordinates[1] - 10}>
+				<text class="station-label" x={feature.coordinates[0]} y={feature.coordinates[1] - 10}>
 					{feature.station} Station</text
 				>
 				<!-- rail line label -->
-				<text
-					class="line-label"
-					x={feature.coordinates[0] + 10}
-					y={feature.coordinates[1] - 10}
-					dy={12}
-				>
+				<text class="line-label" x={feature.coordinates[0]} y={feature.coordinates[1]} dy={1}>
 					{feature.line
 						.replace('AC', 'Atlantic City Line')
 						.replace('GL', 'Gladstone Line')
@@ -101,12 +96,7 @@
 						.replace('RV', 'Raritan Valley Line')}</text
 				>
 				<!-- time label -->
-				<text
-					class="time-label"
-					x={feature.coordinates[0] + 10}
-					y={feature.coordinates[1] - 10}
-					dy={23}
-				>
+				<text class="time-label" x={feature.coordinates[0]} y={feature.coordinates[1]} dy={12}>
 					{feature.day} at {feature.time}</text
 				>
 			{/if}
@@ -115,6 +105,10 @@
 </svg>
 
 <style>
+	.counties {
+		filter: drop-shadow(1px 3px 1px rgba(0 0 0 / 0.25));
+	}
+
 	text {
 		font-family: 'Barlow Condensed', sans-serif;
 	}
@@ -138,9 +132,23 @@
 		text-transform: uppercase;
 	}
 
+	.station-label,
+	.line-label,
+	.time-label {
+		transform: translate(-75px, 30px);
+	}
+
 	@media screen and (max-width: 480px) {
 		svg {
-			transform: scale(4);
+			width: 220px;
+			height: 600px;
+			transform: scale(2.5);
+		}
+
+		.station-label,
+		.line-label,
+		.time-label {
+			transform: translate(-80px, 30px);
 		}
 	}
 </style>
