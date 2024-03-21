@@ -6,7 +6,7 @@ const config = {
     kit: {
         adapter: adapter(),
         paths: {
-            base: process.env.NODE_ENV === 'production' ? '/njt-fatalities' : '',
+			base: process.argv.includes('dev') ? '' : '/njt-fatalities',
         }
     }
 };
