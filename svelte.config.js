@@ -5,10 +5,10 @@ import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 const config = {
  
     kit: {
-		appDir: "_app",
+		appDir: "app",
         adapter: adapter(),
         paths: {
-			base: process.argv.includes('dev') ? '' : '/njt-fatalities',
+			base: process.env.NODE_ENV === 'production' ? '/njt-fatalities' : ''
         }
     },
 	preprocess: vitePreprocess()
