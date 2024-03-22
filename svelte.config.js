@@ -4,6 +4,7 @@ import adapter from '@sveltejs/adapter-static';
 const config = {
  
     kit: {
+		appDir: "_app",
         adapter: adapter(),
         paths: {
 			base: process.argv.includes('dev') ? '' : '/njt-fatalities',
